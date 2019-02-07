@@ -34,7 +34,7 @@
                     <navigationItem key="navigationItem" id="Z1w-r3-EcX">
                         <barButtonItem key="leftBarButtonItem" systemItem="refresh" id="4D6-wE-kMt">
                             <connections>
-                                <action selector="removeTouchPoints:" destination="BV1-FR-VrT" id="nv3-R5-WiY"/>
+                                <action selector="refreshScreen:" destination="BV1-FR-VrT" id="Nqz-7w-ibG"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

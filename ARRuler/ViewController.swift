@@ -42,6 +42,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        removeTouchPoints()
+    
         guard let touchLocation = touches.first?.location(in: sceneView) else {
             fatalError("could not render touch location")
         }
@@ -78,7 +80,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let start = dotNodes[0]
         let end = dotNodes[1]
         
-        // pythagorus variation points for 3D object
+        // pythagoras variation points for 3D object
         let a = end.position.x - start.position.x
         let b = end.position.y - start.position.y
         let c = end.position.z - start.position.z
@@ -90,7 +92,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func updateText(text: String, atPosition position: SCNVector3) {
-        removeTextFromParentNode()
+        removeTextPoint()
         
         let textGeometry = SCNText(string: text, extrusionDepth: 1.0)
         textNode = SCNNode(geometry: textGeometry)
@@ -102,16 +104,22 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.scene.rootNode.addChildNode(textNode)
     }
     
-    @IBAction func removeTouchPoints(_ sender: UIBarButtonItem) {
-        if !dotNodes.isEmpty {
+    @IBAction func refreshScreen(_ sender: UIBarButtonItem) {
+        removeTextPoint()
+        removeTouchPoints()
+    }
+    
+    func removeTouchPoints() {
+        if dotNodes.count >= 2 {
             for dot in dotNodes {
                 dot.removeFromParentNode()
             }
-            removeTextFromParentNode()
+            dotNodes = [SCNNode]()
         }
     }
     
-    func removeTextFromParentNode() {
+    func removeTextPoint() {
         textNode.removeFromParentNode()
     }
+    
 }
