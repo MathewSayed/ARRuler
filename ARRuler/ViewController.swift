@@ -16,15 +16,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     // track all nodes in the screen scene
     var dotNodes = [SCNNode]()
-    
+    var textNode = SCNNode()
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Set the view's delegate
         sceneView.delegate = self
-        
-        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -45,12 +42,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let touchLocation = touches.first?.location(in: sceneView) {
-            let hitTestResults = sceneView.hitTest(touchLocation, types: .featurePoint)
-            if let hitResult = hitTestResults.first {
-                addDot(at: hitResult)
-            }
+        guard let touchLocation = touches.first?.location(in: sceneView) else {
+            fatalError("could not render touch location")
         }
+        
+        let hitTestResults = sceneView.hitTest(touchLocation, types: .featurePoint)
+        
+        guard let hitResult = hitTestResults.first else { return }
+        addDot(at: hitResult)
     }
     
     func addDot(at hitResult: ARHitTestResult) {
@@ -87,17 +86,32 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // distance = √ ((x2 - x2)^2 + (y2 - y1)^2 + (z2 - z1)^2)
         let distance = sqrt(pow(a,2) + pow(b,2) + pow(c, 2))
         
-        updateText(text: "\(distance)", atPosition: end.position)
+        updateText(text: String(format: "%.2f", distance) + "m", atPosition: end.position)
     }
     
     func updateText(text: String, atPosition position: SCNVector3) {
+        removeTextFromParentNode()
+        
         let textGeometry = SCNText(string: text, extrusionDepth: 1.0)
-        let textNode = SCNNode(geometry: textGeometry)
+        textNode = SCNNode(geometry: textGeometry)
         
         textGeometry.firstMaterial?.diffuse.contents = UIColor.red
         textNode.position = SCNVector3(position.x, position.y + 0.01, position.z)
         textNode.scale = SCNVector3(0.01, 0.01, 0.01)
         
         sceneView.scene.rootNode.addChildNode(textNode)
+    }
+    
+    @IBAction func removeTouchPoints(_ sender: UIBarButtonItem) {
+        if !dotNodes.isEmpty {
+            for dot in dotNodes {
+                dot.removeFromParentNode()
+            }
+            removeTextFromParentNode()
+        }
+    }
+    
+    func removeTextFromParentNode() {
+        textNode.removeFromParentNode()
     }
 }
